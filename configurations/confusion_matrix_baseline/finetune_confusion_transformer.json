@@ -1,0 +1,61 @@
+{
+    "name": "Confusion",
+    "n_gpu": 1,
+    "cross_validation": 3,
+
+    "encoder":{
+        "type": "transformer.vit_small",
+        "args":{
+            "weights": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Results/DINO/pretrain.ckpt",
+            "patch_size": 8,
+            "drop_path_rate": 0.1,
+            "freeze": false,
+            "lr_encoder": 1e-6,
+            "lr": 1e-4
+        }
+    },
+
+    "arch": {
+        "type": "Linear_Eval",
+        "args": {
+        }
+    },
+
+    "data_loader": {
+        "type": "ARDSKFoldDataLoader",
+        "args":{
+            "csv_dir": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Image",
+            "batch_size": 64,
+            "image_size": 224, 
+            "xrv_normalize": 2,
+            "use_uncertainty_func": false,
+            "folds":3
+        }
+    },
+
+    "optimizer": {
+        "type": "Adam",
+        "args":{
+        }
+    },
+
+    "metrics": [
+        "precision", "auprc", "auroc", "sensitivity", "specificity", "f1_score"
+    ],
+
+    "trainer": {
+        "type": "Confusion_Trainer",
+        "test_monitor": false, 
+
+        "epochs": 40,
+
+        "save_dir": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Results",
+        "save_period": 100,
+        "verbosity": 2,
+        
+        "monitor": "min val_loss",
+        "early_stop": 10,
+
+        "tensorboard": false
+    }
+}

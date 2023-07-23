@@ -1,0 +1,68 @@
+{
+    "name": "CV_TRAM",
+    "n_gpu": 2,
+    "cross_validation": 3,
+
+    "encoder":{
+        "type": "torchvision.models.resnet50",
+        "args":{
+            "weights": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Results/BYOL/resnet50_pretrained_True_decay_0.99_chexpertdataloader_128_optim_sgd_lr_0.03_wd_0.0004_scheduler_linearwarmupcosineannealinglr_warmup_5/backbone_best.pth",
+            "freeze": false,
+            "lr_encoder": 5e-5,
+            "lr": 5e-5
+        }
+    },
+    "arch": {
+        "type": "TRAM_Model",
+        "args": {
+            "base_predictor_layer": 2,
+            "add_encoder_embed_dim": 32,
+            "add_predictor_hidden_dim": 64,
+            "add_predictor_layer":2
+        }
+    },
+
+    "data_loader": {
+        "type": "ARDSKFoldDataLoader",
+        "args":{
+            "csv_dir": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Image",
+            "batch_size": 64,
+            "image_size": 224, 
+            "uncertainty_csv": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Infor/CXRReview.csv",
+            "uncertainty_encoding":"combined",
+            "use_uncertainty_func": true,
+            "uncertainty_threshold": 2, 
+            "xrv_normalize": false,
+            "clean_data_only": false,
+            "folds": 3
+        }
+    },
+
+    "optimizer": {
+        "type": "Adam",
+        "args":{
+        }
+    },
+
+    "loss": {
+        "type": "TramLoss",
+        "args": {
+            "additon_loss_factor": 0.5
+        }
+    },
+
+    "metrics": [
+        "precision", "auprc", "auroc", "sensitivity", "specificity", "f1_score"
+    ],
+
+    "trainer": {
+        "type": "TRAM_Trainer",
+        "epochs": 40,
+        "save_dir": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Results",
+        "save_period": 100,
+        "verbosity": 2,
+        "monitor": "min val_loss",
+        "early_stop": 10,
+        "tensorboard": false
+    }
+}

@@ -1,0 +1,59 @@
+{
+    "name": "BYOL",
+    "n_gpu": 2,
+
+    "arch": {
+        "type": "BYOL",
+        "args": {
+            "backbone": "resnet50",
+            "image_size": 224,
+            "drop_layer": -1,
+            "pretrained":true,
+            "augmentation": "BestCombineAugmentation",
+            "projection_size": 256,
+            "projection_hidden_size": 4096,
+            "moving_average_decay": 0.99,
+            "use_momentum": true
+        }
+    },
+
+    "data_loader": {
+        "type": "CheXpertDataLoader",
+        "args":{
+            "data_dir": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Public_Data/CheXpert/train_uncertainty.csv",
+            "batch_size": 256,
+            "image_size": 224,
+            "validation_split": 0.2,
+            "num_workers": 0,
+            "patient_split": "csv;PatientID"
+        }
+    },
+
+    "optimizer": {
+        "type": "SGD",
+        "args":{
+            "lr": 0.001,
+            "weight_decay": 0.0004,
+            "momentum":0.9
+        }
+    },
+
+    "lr_scheduler": {
+        "type": "LinearWarmupCosineAnnealingLR",
+        "args": {
+            "warmup_epochs": 5
+        }
+    },
+    "trainer": {
+        "epochs": 20,
+
+        "save_dir": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Results",
+        "save_period": 1,
+        "verbosity": 2,
+        
+        "monitor": "min val_loss",
+        "early_stop": 20,
+
+        "tensorboard": true
+    }
+}

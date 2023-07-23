@@ -1,0 +1,52 @@
+{
+    "name": "Supervised_CV_DownStream",
+    "n_gpu": 1,
+    "cross_validation": 3,
+
+    "encoder":{
+        "type": "torchxrayvision.models.ResNet",
+        "args":{
+            "weights": "resnet50-res512-all",
+            "freeze": true           
+        }
+    },
+    "arch": {
+        "type": "Linear_Eval",
+        "args": {
+        }
+    },
+
+    "data_loader": {
+        "type": "ARDSKFoldDataLoader",
+        "args":{
+            "csv_dir": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Image",
+            "batch_size": 64,
+            "image_size": 512, 
+            "xrv_normalize": true,
+            "use_uncertainty_func": false,
+            "folds":3
+        }
+    },
+
+    "optimizer": {
+        "type": "Adam",
+        "args":{
+            "lr": 1e-3
+        }
+    },
+
+    "metrics": [
+        "precision", "auprc", "auroc", "sensitivity", "specificity", "f1_score"
+    ],
+
+    "trainer": {
+        "type": "Evaluation_Trainer",
+        "epochs": 40,
+        "save_dir": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Results",
+        "save_period": 100,
+        "verbosity": 2,
+        "monitor": "min val_loss",
+        "early_stop": 10,
+        "tensorboard": true
+    }
+}

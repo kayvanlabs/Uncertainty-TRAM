@@ -1,0 +1,52 @@
+{
+    "name": "CV_TRAM",
+    "n_gpu": 1,
+    "cross_validation": 3,
+    
+    "encoder":{
+        "type": "torchvision.models.resnet50",
+        "args":{
+            "weights": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Results/BYOL/resnet50_pretrained_True_decay_0.99_chexpertdataloader_128_optim_sgd_lr_0.03_wd_0.0004_scheduler_linearwarmupcosineannealinglr_warmup_5/backbone_best.pth",
+            "freeze": true           
+        }
+    },
+    "arch": {
+        "type": "Linear_Eval",
+        "args": {
+        }
+    },
+
+    "data_loader": {
+        "type": "ARDSKFoldDataLoader",
+        "args":{
+            "csv_dir": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Image",
+            "batch_size": 64,
+            "image_size": 224, 
+            "xrv_normalize": false,
+            "clean_data_only": true,
+            "folds": 3
+        }
+    },
+
+    "optimizer": {
+        "type": "Adam",
+        "args":{
+            "lr": 5e-5
+        }
+    },
+
+    "metrics": [
+        "precision", "auprc", "auroc", "sensitivity", "specificity", "f1_score"
+    ],
+
+    "trainer": {
+        "type": "Evaluation_Trainer",
+        "epochs": 40,
+        "save_dir": "/nfs/turbo/med-kayvan-lab/Projects/ARDS/Data/Processed/ARDS/CXR_Representation_Learning/Results",
+        "save_period": 100,
+        "verbosity": 2,
+        "monitor": "min val_loss",
+        "early_stop": 10,
+        "tensorboard": false
+    }
+}
